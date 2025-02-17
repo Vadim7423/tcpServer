@@ -155,7 +155,6 @@ void VoltMeterProtocol::startMeasure(int client_socet, const std::string &str)
         int max = channel.range().max() / channel.range().min();
         float val = std::experimental::randint(min, max);
         channel.setValue(val * channel.range().min());
-        std::cout << channel.value() << std::endl;
     });
 
     m_channels.channel(channel_id).setStatus(Channel::Status::measure_state);
@@ -172,6 +171,7 @@ void VoltMeterProtocol::stopMeasure(int client_socet, const std::string &str)
 
     if(!m_measure_channels.count(params[0])) {
         std::string command = "stop_measure fail " + params[0] + '\n';
+        send(client_socet, command.c_str(), command.size(), 0);
         return;
     }
 
@@ -189,6 +189,7 @@ void VoltMeterProtocol::getResult(int client_socet, const std::string &str)
 
     if(!m_measure_channels.count(params[0])) {
         std::string command = "get_result fail " + params[0] + '\n';
+        send(client_socet, command.c_str(), command.size(), 0);
         return;
     }
 
@@ -204,7 +205,7 @@ std::vector<std::string> VoltMeterProtocol::getStrArray(const std::string &str)
     size_t begin = 0;
     while(pos != str.npos) {
         pos = str.find(',', pos);
-        tokens.push_back(str.substr(begin, pos));
+        tokens.emplace_back(str.substr(begin, pos));
 
         while(str[pos] == ' ' || str[pos] == ',') {
             ++pos;

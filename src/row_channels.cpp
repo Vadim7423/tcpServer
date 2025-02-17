@@ -3,6 +3,7 @@
 
 RowChannels::RowChannels(uint8_t size, const Range& default_range)
 {
+    m_queue.reserve(size * 2);
     for(uint8_t i = 0; i < size; ++i) {
         m_queue.emplace_back(new Channel(default_range));
     }
